@@ -1,0 +1,48 @@
+{
+  "name": "vertexcover",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack --mode development ./frontend/src/index.js --output ./frontend/static/frontend/main.js",
+    "build": "webpack --mode production ./frontend/src/index.js --output ./frontend/static/frontend/main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "@babel/preset-react": "^7.9.4",
+    "babel-loader": "^8.1.0",
+    "babel-plugin-macros": "^2.8.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-remove-console": "^6.9.4",
+    "dev-console.macro": "^0.1.0",
+    "prop-types": "^15.7.2",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
+  },
+  "dependencies": {
+    "@material-ui/core": "^4.9.11",
+    "@material-ui/icons": "^4.9.1",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.5.0",
+    "@testing-library/user-event": "^7.2.1",
+    "hard-source-webpack-plugin": "^0.13.1",
+    "json-server": "^0.16.1",
+    "material-ui": "^0.20.2",
+    "react": "^16.13.1",
+    "react-document-title": "^2.0.3",
+    "react-dom": "^16.13.1",
+    "react-event-listener": "^0.6.6",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "3.4.1",
+    "react-simple-animate": "^3.3.8",
+    "react-tooltip": "^4.2.6",
+    "yargs-parser": "^18.1.3"
+  }
+}
