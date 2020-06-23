@@ -7,3 +7,5 @@
 /frontend/static/
 /**/__pycache__/
 setup.sh
+/vertexcover/settings/local.py
+/vertexcover/settings/production.py
