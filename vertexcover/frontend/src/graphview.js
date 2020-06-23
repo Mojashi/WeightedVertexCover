@@ -174,9 +174,12 @@ class Graph extends React.Component {
 
         for (let i = 0; vertexPoss.length > i; i++) fs[i] = new Point(0, 0);
         for (let i = 0; vertexPoss.length > i; i++) {
+            if(this.props.ignoreSelected && this.props.vAppearence[i].selected) continue;
+
             const v1 = vertexPoss[i];
             for (let j = 0; vertexPoss.length > j; j++) {
                 if (i === j) continue;
+                if(this.props.ignoreSelected && this.props.vAppearence[j].selected) continue;
                 const v2 = vertexPoss[j], len = Math.sqrt(Math.pow(v1.pos.x - v2.pos.x, 2) + Math.pow(v1.pos.y - v2.pos.y, 2)),
                     f = coulomb / Math.max(100.0, len * len);
                 fs[i].add(new Point(f * (v1.pos.x - v2.pos.x) / len, f * (v1.pos.y - v2.pos.y) / len));
@@ -184,6 +187,8 @@ class Graph extends React.Component {
         }
 
         for (let i = 0; edges.length > i; i++) {
+            if(this.props.ignoreSelected && edges[i].selected) continue;
+
             const v1 = vertexPoss[edges[i].from], v2 = vertexPoss[edges[i].to],
                 len = Math.sqrt(Math.pow(v1.pos.x - v2.pos.x, 2) + Math.pow(v1.pos.y - v2.pos.y, 2)),
                 f = spring * (len - naturalLen);
@@ -318,6 +323,7 @@ class VertexCoverGame extends React.Component {
             lastSubmitResult: null,
             height: 0,
             naturalLen:200.0,
+            ignoreSelected: false,
         }
         this.handleVertexClick = this.handleVertexClick.bind(this);
         this.submitAnswer = this.submitAnswer.bind(this);
@@ -373,7 +379,8 @@ class VertexCoverGame extends React.Component {
         if (prevProps.user != this.props.user) {
             this.fetchSubmission();
         }
-        twttr.widgets.load(document.getElementsByClassName("MuiDialog-root"));
+        if (this.state.openResultDialog)
+            twttr.widgets.load(document.getElementsByClassName("MuiDialog-root"));
     }
     // setRandomGraph(){
     //     const edges = [], n = this.state.currentN, edNum = n * 1.5, vApp = [];
@@ -485,7 +492,7 @@ class VertexCoverGame extends React.Component {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': csrftoken
             },
-            body: JSON.stringify({ 'solution': selV, 'problem_id': this.props.problemId, 'user_id': 1 })
+            body: JSON.stringify({ 'solution': selV, 'problem_id': this.props.problemId })
         })
             .then(response => response.json())
             .then((json) => {
@@ -519,7 +526,7 @@ class VertexCoverGame extends React.Component {
                 </div>
                  */}
                 <div style={{ width: "100%", height: "100%", borderRadius: "10px" }}>
-                    <Graph vAppearence={this.state.vAppearence} onMouseUpOnVertex={this.handleVertexClick} onDoubleClick={this.handleVertexDoubleClick} id="graph0" nOfVertices={this.state.nOfVertices} edges={this.state.edges} naturalLen={this.state.naturalLen} width={"100%"} height={"100%"} />
+                    <Graph ignoreSelected={this.state.ignoreSelected} vAppearence={this.state.vAppearence} onMouseUpOnVertex={this.handleVertexClick} onDoubleClick={this.handleVertexDoubleClick} id="graph0" nOfVertices={this.state.nOfVertices} edges={this.state.edges} naturalLen={this.state.naturalLen} width={"100%"} height={"100%"} />
 
                     {this.props.justView ||
                         <Box p="10px" style={{ pointerEvents: 'none', fontSize: "large", position: "absolute", bottom: "10%", right: "10%" }}>
@@ -534,6 +541,13 @@ class VertexCoverGame extends React.Component {
                                 <Box display="flex" justifyContent="space-around" paddingBottom="8px">
                                     <Button variant="contained" color="primary" style={{ pointerEvents: 'auto'}} onClick={()=>this.setAllVertexFixed(true)}>全て固定</Button>
                                     <Button variant="contained" color="primary" style={{ pointerEvents: 'auto'}} onClick={()=>this.setAllVertexFixed(false)}>全て解放</Button>
+                                </Box>
+                                <Box display="flex" justifyContent="space-around" paddingBottom="8px">
+                                    {this.state.ignoreSelected ? 
+                                    <Button variant="contained" color="secondary" style={{ pointerEvents: 'auto'}} onClick={()=>this.setState({ignoreSelected:false})}>選択済み頂点/辺を尊重</Button>
+                                    :
+                                    <Button variant="contained" color="primary" style={{ pointerEvents: 'auto'}} onClick={()=>this.setState({ignoreSelected:true})}>選択済み頂点/辺を無視</Button>
+                                    }
                                 </Box>
                             </Box>
                             <TableContainer component={Paper} style={{ userSelect: "none", marginBottom: '10px', backgroundColor: 'rgba( 255, 255, 255, 0.55 )' }}>
@@ -602,10 +616,10 @@ class VertexCoverGame extends React.Component {
 
                                 {this.state.lastSubmitResult > this.state.OPT ?
                                     <a style={{ display: (this.state.lastSubmitResult == this.state.OPT && !this.state.waitingSubmit ? 'visible' : 'none') }} target="_blank" href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button"
-                                        data-text={"Problem" +this.props.problemId + "でスコア" + this.state.lastSubmitResult + "(OPT:" + this.state.OPT + ")を取りました！"} data-show-count="false">Tweet</a>
+                                        data-text={"Problem" +this.props.problemId + "でスコア" + this.state.lastSubmitResult + "(OPT:" + this.state.OPT + ")を取りました！ #WeightedVertexCover"} data-show-count="false">Tweet</a>
                                     :
                                     <a style={{ display: (this.state.lastSubmitResult == this.state.OPT && !this.state.waitingSubmit ? 'visible' : 'none') }} target="_blank" href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button"
-                                        data-text={"Problem" + this.props.problemId + "で最適解を出しました！"} data-show-count="false">Tweet</a>
+                                        data-text={"Problem" + this.props.problemId + "で最適解を出しました！ #WeightedVertexCover"} data-show-count="false">Tweet</a>
                                 }
                             </DialogActions>
                         }

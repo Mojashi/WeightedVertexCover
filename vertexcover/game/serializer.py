@@ -51,7 +51,7 @@ class SubmissionSerializer(DynamicFieldsModelSerializer):
         model = Submission
         fields = ('id','user', 'problem', 'solution', 'score', 'is_best','submitted_at',)
     def get_user(self, obj):
-        ret = UserSerializer(obj.user, fields = ('id','username','twitter_screenname','twitter_pic_url')).data
+        ret = UserSerializer(obj.user, fields = ('id','username','solvedCount', 'twitter_screenname','twitter_pic_url')).data
         return ret
     def get_problem(self, obj):
         ret = ProblemSerializer(obj.problem, fields = ('id','OPT')).data

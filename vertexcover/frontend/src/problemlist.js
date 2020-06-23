@@ -46,7 +46,7 @@ class ProblemList extends React.Component {
   fetchProblemList(pageNum=1) {
     this.setState({fetchingNow:pageNum});
 
-    fetch("/api/problems/?page=" + pageNum)
+    fetch("/api/problems/?ordering=id&page=" + pageNum)
       .then(response => response.json())
       .then((json) => {
         if (json.page_number === this.state.fetchingNow) {

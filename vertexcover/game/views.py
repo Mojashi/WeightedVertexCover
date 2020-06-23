@@ -14,7 +14,8 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from rest_framework import permissions
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-
+from django.core import management
+import random
 
 
 class  UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -59,6 +60,9 @@ class ProblemViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Problem.objects.all()
     serializer_class = ProblemSerializer
     pagination_class = ProblemPagination
+    filter_backends = [filters.OrderingFilter]
+
+    ordering_fields = ('id', 'solvedCount', 'numOfVertices')
 
     def get_serializer(self, *args, **kwargs):
         if 'fields[]' in self.request.query_params:
@@ -156,23 +160,41 @@ def submit(request, format=None):
 
     else:
         submission = Submission(user=user, problem=problem, solution=solution, score=score)
+        submission.save()
+
         if problem.OPT == score:
             print("optimal!")
             user.solvedProblems.add(problem)
             user.solvedCount = user.solvedProblems.count()
-        
-        befBest = user.submissions.filter(is_best=True).filter(problem=problem)
-        assert(befBest.count() <= 1)
+            user.save()
 
-        if not befBest.exists() or befBest[0].score > score:
+        befBests = user.submissions.filter(is_best=True).filter(problem=problem).order_by('-score')
+            
+        while befBests.count() > 1:
+            print("ERROR!!!! BESTS ARE TOO MANY problem:" + str(problem.id) + " user:" + user.username)
+            b = befBests[0]
+            b.is_best = False
+            b.save()
+            befBests = user.submissions.filter(is_best=True).filter(problem=problem).order_by('-score')
+            
+        bestSub = None
+        if befBests.exists():
+            bestSub = befBests[0]
+
+        if bestSub == None or bestSub.score > score:
             submission.is_best = True
 
-        if befBest.exists():
-            befBest[0].is_best = False
-            befBest[0].save()
+            if bestSub:
+                bestSub.is_best = False
+                bestSub.save()
 
         submission.save()
-        user.save()
+
+        if user.solvedCount == Problem.objects.count():
+            print("ALL PROBLEMS ARE SOLVED!!!")
+            management.call_command('addProblem', 1, 10, 71, 1, 5 ,100 if random.random() < 0.5 else 10)
+            print("NEW PROBLEMS APPEARED")
+
         return JsonResponse({'status':'success', 'score':score})
 
 @api_view(['GET'])

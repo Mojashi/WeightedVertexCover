@@ -71,11 +71,19 @@ export function Rule(props) {
             <TableCell align="left">頂点の自動移動をすべてオンにします</TableCell>
           </TableRow>
           <TableRow>
+            <TableCell component="th" scope="row">選択済み頂点/辺を無視</TableCell>
+            <TableCell align="left">現在選択されている頂点と、すでに端点が選択済みの辺を自動位置調整の際に無視します</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell component="th" scope="row">OPT</TableCell>
+            <TableCell align="left">達成可能な最適値です</TableCell>
+          </TableRow>
+          <TableRow>
             <TableCell component="th" scope="row">コスト</TableCell>
             <TableCell align="left">現在選択されている頂点のコストの和です</TableCell>
           </TableRow>
           <TableRow>
-            <TableCell component="th" scope="row">残り変数</TableCell>
+            <TableCell component="th" scope="row">残り辺数</TableCell>
             <TableCell align="left">現在、端点のどちらも選択されていない辺の数です</TableCell>
           </TableRow>
         </TableBody>
